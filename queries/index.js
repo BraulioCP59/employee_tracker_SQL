@@ -1,16 +1,20 @@
+require('dotenv').config();
 const util = require("util");
 const mysql = require("mysql2");
 const {prompt} = require("inquirer");
+const Add_Role = require("../lib/prompts/Add_Role");
+const Add_Employee = require("../lib/prompts/Add_Employee");
+const Add_Department = require("../lib/prompts/Add_Department");
 
 const db = mysql.createConnection({
     host:"localhost",
-    //PUT YOUR OWN CREDENTIALS HERE IN THE CONNECTION CONFIG OBJECT MAKE SURE YOU RUN THE SCHEMA.SQL FIRST!!!
-    user: "root",
-    password: "root",
-    database: "thirty_one_flavors"
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 const query = util.promisify(db.query).bind(db);
+console.log("THis is running", query);
 
 const queryManager = {
     view(tableName){
@@ -18,29 +22,20 @@ const queryManager = {
         return query(`SELECT * FROM ${tableName}`)
     },
     async add(tableName){
-        const {name, calories, price } = await prompt([
-            {
-            message: `What ${tableName.slice(0,-1)} would you like to add?`,
-            name: 'name',
-        }, 
+        switch(tableName)
         {
-            message: `How many calories is this ${tableName.slice(0,-1)}?`,
-            name: "calories",
-            type: "list",
-            choices: [20, 50, 100, 150, 200, 1000]
-        },
-        {
-            message: `How much is this ${tableName.slice(0,-1)}?`,
-            name: "price",
-            type: "input",
-            validate: (val) => {
-                return !isNaN(val) || "you need to put a number fool!"
-            }
-        },
-    ]);
+            case 'addDeptPlaceholder':
+                const {name} = await prompt(Add_Department);
+                    return query(`INSERT INTO ${tableName}(name) VALUES ('${name}')`);
 
-    return query(`INSERT INTO ${tableName}
-     (${tableName.slice(0,-1)}, calories, price) VALUES ('${name}', ${calories}, ${price})`)
+            case 'addRolePlaceholder':
+                const {roleName, roleSalary, roleDepartment } = await prompt(Add_Role);
+                    return query(`INSERT INTO ${tableName}(title, department, salary) VALUES ('${roleName}', ${roleSalary}, ${roleDepartment})`);
+
+            case 'addEmpPlaceholder':
+                const {employeeFirstName, employeeLastName, employeeRole, employeeManager } = await prompt(Add_Employee);
+                    return query(`INSERT INTO ${tableName}(first_name, last_name, title, manager) VALUES ('${employeeFirstName}', ${employeeLastName}, ${employeeRole}, ${employeeManager})`);
+        }
     },
     async delete(tableName){
         const data = await query(`SELECT * FROM ${tableName}`);
