@@ -5,20 +5,20 @@ USE employee_tracker;
 
 CREATE TABLE employees(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    first_name varchar(33) NOT NULL, 
-    last_name varchar(33) NOT NULL, 
-    title varchar(33) NOT NULL,
-    manager varchar(33) NOT NULL 
+    first_name varchar(30) NOT NULL, 
+    last_name varchar(30) NOT NULL, 
+    role_id INT NOT NULL,
+    manager_id INT NOT NULL 
 );
 
 CREATE TABLE roles(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    title varchar(33) NOT NULL,
-    department varchar(33) NOT NULL, 
-    salary INT NOT NULL 
+    title varchar(30) NOT NULL,
+    department_id INT NOT NULL, 
+    salary DECIMAL NOT NULL 
 );
 
 CREATE TABLE departments(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    department_name varchar(33) NOT NULL 
+    department_name varchar(30) NOT NULL 
 );

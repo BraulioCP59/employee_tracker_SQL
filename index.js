@@ -5,13 +5,13 @@ const db = require("./queries");
 const main = async () =>{
   //
   const response = await prompt(Main_Menu);
-  console.log(response);
+  console.log("\n\n");
 
   const [method, argument] = response.mainMenuSelection.split(" ") //["view", "flavors"]
   //
   const result = await db[method](argument);
   console.table(result);
-  setTimeout(main, 20000);
+  setTimeout(main, 2000);
 
 }
  
