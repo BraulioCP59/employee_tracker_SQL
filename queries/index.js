@@ -16,7 +16,6 @@ const db = mysql.createConnection({
 });
 
 const query = util.promisify(db.query).bind(db);
-console.log("THis is running", query);
 
 
 
@@ -68,7 +67,6 @@ const queryManager = {
                 //loads current employees data into add employee prompt for selecting what employee with title manager the new employee has been assigned to
                 Add_Employee[3].choices = [{name: 'none', value: null}];
                 managerData = await query(`SELECT * FROM employees INNER JOIN roles on employees.role_id = roles.id`);// need query that gets employees with role id == role title of Manager. 
-                console.log("Here i am at line 64", managerData);
 
                 managerData.forEach((manager) =>{
                     if(manager.title === 'Manager')
