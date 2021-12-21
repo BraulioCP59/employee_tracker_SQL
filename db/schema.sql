@@ -8,7 +8,7 @@ CREATE TABLE employees(
     first_name varchar(30) NOT NULL, 
     last_name varchar(30) NOT NULL, 
     role_id INT NOT NULL,
-    manager_id INT NOT NULL 
+    manager_id INT 
 );
 
 CREATE TABLE roles(
@@ -22,3 +22,5 @@ CREATE TABLE departments(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     department_name varchar(30) NOT NULL 
 );
+
+

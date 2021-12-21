@@ -20,8 +20,13 @@ console.log("THis is running", query);
 
 const queryManager = {
     view(tableName){
-        console.log(tableName)
-        return query(`SELECT * FROM ${tableName}`)
+        if(tableName === 'employees')
+        {
+            // returns formated employee data
+           return query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, roles.salary,employees.manager_id, departments.department_name FROM employees INNER JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id`);
+        }else {
+            return query(`SELECT * FROM ${tableName}`)
+        }
     },
     async add(tableName){
         switch(tableName)
@@ -47,8 +52,31 @@ const queryManager = {
                 return query(`INSERT INTO ${tableName}(title, salary, department_id) VALUES ('${roleName}', ${roleSalary}, ${roleDepartment})`);
             //
             case 'employees':
+                //loads current roles data into add employee prompt for selecting what role the new employee has
+                Add_Employee[2].choices = [];
+                roleData = await query(`SELECT * FROM roles`);
+
+                roleData.forEach((role) =>{
+                    
+                    let choice = {name: role.title,value: role.id}
+                    Add_Employee[2].choices.push(choice);
+                })
+
+
+                //loads current employees data into add employee prompt for selecting what employee with title manager the new employee has been assigned to
+                Add_Employee[3].choices = [{name: 'none', value: null}];
+                managerData = await query(`SELECT * FROM employees INNER JOIN roles on employees.role_id = roles.id`);// need query that gets employees with role id == role title of Manager. 
+                console.log("Here i am at line 64", managerData);
+
+                managerData.forEach((manager) =>{
+                    if(manager.title === 'Manager')
+                    {
+                        let choice = {name: manager.first_name + " " + manager.last_name, value: manager.id}
+                        Add_Employee[3].choices.push(choice);
+                    }
+                })
                 const {employeeFirstName, employeeLastName, employeeRole, employeeManager } = await prompt(Add_Employee);
-                return query(`INSERT INTO ${tableName}(first_name, last_name, title, manager) VALUES ('${employeeFirstName}', ${employeeLastName}, ${employeeRole}, ${employeeManager})`);
+                return query(`INSERT INTO ${tableName}(first_name, last_name, role_id, manager_id) VALUES ('${employeeFirstName}', '${employeeLastName}', ${employeeRole}, ${employeeManager})`);
         }
     },
     async update(tableName){
