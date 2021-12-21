@@ -5,6 +5,8 @@ const {prompt} = require("inquirer");
 const Add_Role = require("../lib/prompts/Add_Role");
 const Add_Employee = require("../lib/prompts/Add_Employee");
 const Add_Department = require("../lib/prompts/Add_Department");
+const Update_Employee_Role = require("../lib/prompts/Update_Employee_Role");
+const { Console } = require('console');
 
 const db = mysql.createConnection({
     host:"localhost",
@@ -80,16 +82,45 @@ const queryManager = {
         }
     },
     async update(tableName){
-        const data = await query(`SELECT * FROM ${tableName}`);
-        console.log(data);
-        const {selection} = await prompt({
-            message: `Which ${tableName.slice(0,-1)} would you like to remove?`,
-            type: "list",
-            choices: data.map(item => ({name: item[tableName.slice(0,-1)], value: item.id})),
-            name: 'selection'
-        });
+        switch(tableName)
+        {
+            
+            case 'departments':
+                console.log("Sorry, this functionality is not yet supported!");
+                break;
 
-        return query(`DELETE FROM ${tableName} WHERE id = ${selection}`)
+            
+            case 'roles':
+               console.log("Sorry, this functionality is not yet supported!");
+               break;
+
+            //
+            case 'employees':
+                //loads current employee data into update employee role prompt for selecting what employe should have their role updated
+                Update_Employee_Role[0].choices = [];
+                employeeData = await query(`SELECT * FROM employees`);
+                
+                employeeData.forEach((emp) =>{
+                    
+                    let choice = {name: emp.first_name + " " + emp.last_name, value: emp.id}
+                    Update_Employee_Role[0].choices.push(choice);
+
+                })
+
+                //loads current role data into update employee role prompt prompt for selecting what employe should have their role updated
+                Update_Employee_Role[1].choices = [];
+                rolesData = await query(`SELECT * FROM roles`);
+
+                rolesData.forEach((role) =>{
+
+                    let choice = {name: role.title, value: role.id}
+                    Update_Employee_Role[1].choices.push(choice);
+
+                })
+
+                const {employee, newRole} = await prompt(Update_Employee_Role);
+                return query(`UPDATE employees SET role_id = ${newRole} WHERE id = ${employee}`);
+        }
     }
 }
 
